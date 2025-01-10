@@ -25,6 +25,7 @@ export default function LoginPage() {
     try {
       loginMutation.mutate({ email, password });
     } catch (error) {
+      console.log(error);
       toast({ title: "Erro", description: ERROR_MESSAGE_LOGIN });
     }
   };
