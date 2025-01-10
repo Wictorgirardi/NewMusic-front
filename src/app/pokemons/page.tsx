@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { URL_API } from "@/constants/constants";
 import { Pokemon } from "./pokemons.interface";
@@ -10,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import PokemonCard from "@/components/pokemonCard/pokemonCard";
+import Skelletons from "@/components/skelletons/skelletons";
 
 export default function PokemonsPage() {
   const [search, setSearch] = useState("");
@@ -18,7 +18,7 @@ export default function PokemonsPage() {
 
   const fetchPokemons = async () => {
     const token = Cookies.get("token");
-    const { data } = await axios.get(
+    const response = await fetch(
       `${URL_API}/api/pokemons?search=${search}&page=${page}`,
       {
         headers: {
@@ -26,7 +26,8 @@ export default function PokemonsPage() {
         },
       }
     );
-    return data;
+
+    return response.json();
   };
 
   const { data, isLoading, isError } = useQuery({
@@ -34,7 +35,16 @@ export default function PokemonsPage() {
     queryFn: fetchPokemons,
   });
 
-  if (isLoading) return <div>Carregando...</div>;
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      Cookies.remove("token");
+      Cookies.remove("user");
+    },
+    onSuccess: () => {
+      router.push("/login");
+    },
+  });
+
   if (isError) return <div>Erro ao carregar os dados</div>;
 
   return (
@@ -43,9 +53,7 @@ export default function PokemonsPage() {
         <h1 className="text-2xl font-bold">Pokémons da Região de Kanto</h1>
         <Button
           onClick={() => {
-            Cookies.remove("token");
-            Cookies.remove("user");
-            router.push("/login");
+            logoutMutation.mutate();
           }}
         >
           Sair
@@ -63,8 +71,9 @@ export default function PokemonsPage() {
           setSearch(e.target.value);
         }}
       />
+      <Skelletons isLoading={isLoading} />
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {data.pokemons.map((pokemon: Pokemon) => (
+        {data?.pokemons.map((pokemon: Pokemon) => (
           <PokemonCard key={pokemon.number} {...pokemon} />
         ))}
       </div>
@@ -77,7 +86,7 @@ export default function PokemonsPage() {
           Anterior
         </Button>
         <Button
-          disabled={page === data.totalPages || data.totalPages === 0}
+          disabled={page === data?.totalPages || data?.totalPages === 0}
           onClick={() => setPage((prev) => prev + 1)}
         >
           Próximo
