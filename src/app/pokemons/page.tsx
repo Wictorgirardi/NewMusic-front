@@ -45,7 +45,12 @@ export default function PokemonsPage() {
     },
   });
 
-  if (isError) return <div>Erro ao carregar os dados</div>;
+  if (isError)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Erro ao carregar os dados!
+      </div>
+    );
 
   return (
     <div className="p-6">

@@ -23,13 +23,13 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      registerMutation.mutate({ email, password });
+      loginMutation.mutate({ email, password });
     } catch (error) {
       toast({ title: "Erro", description: ERROR_MESSAGE_LOGIN });
     }
   };
 
-  const registerMutation = useMutation({
+  const loginMutation = useMutation({
     mutationFn: async (data: LoginFormData) => {
       const response = await fetch(`${URL_API}/api/auth/login`, {
         method: "POST",
@@ -81,7 +81,12 @@ export default function LoginPage() {
               required
             />
           </div>
-          <Button className="w-full">Entrar</Button>
+          <Button
+            className="w-full"
+            disabled={loginMutation.status === "pending"}
+          >
+            {loginMutation.status === "pending" ? "Entrando..." : "Entrar"}
+          </Button>
         </form>
         <Button
           className="w-full p-2 text-black bg-white rounded hover:bg-gray-200 mt-2"
