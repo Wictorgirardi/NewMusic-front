@@ -1,5 +1,37 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Tecnologias e Padrões Utilizados
+
+Este projeto utiliza uma variedade de tecnologias e padrões de desenvolvimento para garantir uma aplicação robusta, escalável e de fácil manutenção. Abaixo estão as principais tecnologias e padrões adotados:
+
+### Tecnologias
+
+- **Next.js**: Um framework React para produção que oferece renderização híbrida estática e dinâmica, suporte a TypeScript, roteamento baseado em arquivos, e muito mais.
+- **React**: Biblioteca JavaScript para construção de interfaces de usuário.
+- **TypeScript**: Superset do JavaScript que adiciona tipagem estática ao código, ajudando a evitar erros e melhorar a manutenção do código.
+- **Tailwind CSS**: Framework CSS utilitário que permite a criação rápida de interfaces de usuário estilizadas com classes utilitárias.
+- **React Query**: Biblioteca para gerenciamento de estado de dados assíncronos, como chamadas de API, com funcionalidades de caching, sincronização, e muito mais.
+- **Cookies.js**: Biblioteca para manipulação de cookies no navegador.
+- **Vercel**: Plataforma de hospedagem e deploy contínuo, otimizada para aplicações Next.js.
+
+### Padrões de Desenvolvimento
+
+- **Componentização**: O projeto é estruturado em componentes reutilizáveis, facilitando a manutenção e a escalabilidade da aplicação.
+- **Hooks**: Utilização de hooks do React para gerenciamento de estado e efeitos colaterais, promovendo um código mais limpo e funcional.
+- **Arquitetura de Pastas**: Organização clara das pastas e arquivos, separando componentes, páginas, hooks, interfaces, e constantes.
+- **Responsividade**: Utilização de Tailwind CSS para garantir que a aplicação seja responsiva e funcione bem em diferentes dispositivos e tamanhos de tela.
+- **Gerenciamento de Estado**: Uso do React Query para gerenciamento eficiente do estado de dados assíncronos, melhorando a experiência do usuário com caching e sincronização automática.
+- **Autenticação**: Manipulação de tokens de autenticação utilizando cookies para gerenciar sessões de usuário de forma segura.
+- **Boas Práticas de Código**: Adoção de boas práticas de código, como tipagem com TypeScript, uso de ESLint e Prettier para linting e formatação, garantindo um código consistente e livre de erros.
+
+### Estrutura do Projeto
+
+- **/components**: Contém os componentes reutilizáveis da aplicação.
+- **/pages**: Contém as páginas da aplicação, seguindo a estrutura de roteamento do Next.js.
+- **/hooks**: Contém hooks personalizados para lógica reutilizável.
+- **/interfaces**: Contém definições de tipos e interfaces TypeScript.
+- **/constants**: Contém constantes utilizadas na aplicação, como URLs de API.
+
 ## Getting Started
 
 First, run the development server:
