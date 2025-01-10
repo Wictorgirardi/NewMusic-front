@@ -1,9 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { LoginFormData } from "./login.interface";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  ERROR_MESSAGE,
+  ERROR_MESSAGE_LOGIN,
+  URL_API,
+} from "@/constants/constants";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,46 +23,73 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(
-        "http://localhost:3001/api/auth/login",
-        { email, password }
-      );
-      console.log(data);
-      Cookies.set("token", data.token);
-      Cookies.set("user", data.user.name);
-      router.push("/pokemons");
+      registerMutation.mutate({ email, password });
     } catch (error) {
-      console.error("Erro ao fazer login:", error);
+      toast({ title: "Erro", description: ERROR_MESSAGE_LOGIN });
     }
   };
-  
+
+  const registerMutation = useMutation({
+    mutationFn: async (data: LoginFormData) => {
+      const response = await fetch(`${URL_API}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(ERROR_MESSAGE);
+      }
+
+      return response.json();
+    },
+    onSuccess: (response) => {
+      Cookies.set("token", response.token);
+      Cookies.set("user", response.user.name);
+      router.push("/pokemons");
+    },
+    onError: (response) => {
+      toast({
+        title: "Erro",
+        description: response.message,
+      });
+    },
+  });
+
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <form className="p-6 bg-white rounded shadow" onSubmit={handleSubmit}>
-        <h2 className="mb-4 text-2xl font-bold">Login</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-2 mb-4 border rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Senha"
-          className="w-full p-2 mb-4 border rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button className="w-full p-2 text-white bg-blue-500 rounded">
-          Entrar
-        </button>
-        <button className="w-full p-2 text-white bg-blue-500 rounded" onClick={() => router.push("/cadastro")}>
-          Cadastro
-        </button>
-      </form>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+      <div className="md:w-full max-w-md p-8 bg-white rounded-md shadow-md sm:m-2">
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <h1 className="text-2xl font-bold mb-4">Login</h1>
+          <div>
+            <Label htmlFor="email">E-mail</Label>
+            <Input
+              type="email"
+              placeholder="E-mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Senha</Label>
+            <Input
+              type="password"
+              placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <Button className="w-full">Entrar</Button>
+        </form>
+        <Button
+          className="w-full p-2 text-black bg-white rounded hover:bg-gray-200 mt-2"
+          onClick={() => router.push("/cadastro")}
+        >
+          Não tem cadastro? Clique aqui.
+        </Button>
+      </div>
     </div>
   );
 }

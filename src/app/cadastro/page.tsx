@@ -3,17 +3,12 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/button";
-import { Label } from "@/components/label";
-import { Input } from "@/components/input";
-
-
-
-interface RegisterFormData {
-  name: string;
-  email: string;
-  password: string;
-}
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { RegisterFormData } from "./cadastro.interface";
+import { toast } from "@/hooks/use-toast";
+import { ERROR_MESSAGE, LOGIN_ROUTE, URL_API } from "@/constants/constants";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -24,32 +19,30 @@ export default function RegisterPage() {
     password: "",
   });
 
-  // Função de registro usando TanStack Query
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterFormData) => {
-      const response = await fetch("http://localhost:3001/api/auth/register", {
+      const response = await fetch(`${URL_API}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
-        throw new Error(
-          "Erro ao registrar. Verifique os dados e tente novamente."
-        );
+        throw new Error(ERROR_MESSAGE);
       }
 
       return response.json();
     },
-    onSuccess: () => {
-      /* toast({
+    onSuccess: (response) => {
+      toast({
         title: "Sucesso",
-        description: "Cadastro realizado com sucesso!",
-      }); */
-      router.push("/login");
+        description: response.message,
+      });
+      router.push(LOGIN_ROUTE);
     },
-    onError: () => {
-     /*  toast({ title: "Erro", description: "Ocorreu um erro ao cadastrar." }); */
+    onError: (response) => {
+      console.log(response.message);
+      toast({ title: "Erro", description: response.message });
     },
   });
 
@@ -65,7 +58,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-md shadow-md">
+      <div className="max-w-md p-8 bg-white rounded-md shadow-md m-4">
         <h1 className="text-2xl font-bold mb-4">Cadastro</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -112,6 +105,12 @@ export default function RegisterPage() {
             {registerMutation.status === "pending"
               ? "Cadastrando..."
               : "Cadastrar"}
+          </Button>
+          <Button
+            className="w-full p-2 text-black bg-white rounded hover:bg-gray-200"
+            onClick={() => router.push("/login")}
+          >
+            Já possui cadastro? Clique aqui.
           </Button>
         </form>
       </div>

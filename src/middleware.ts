@@ -2,20 +2,33 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("authToken"); // Nome do cookie usado para autenticação
+  const token = request.cookies.get("token");
 
-  // Rotas protegidas
-  const protectedRoutes = ["/pokemons"];
+  const url = request.nextUrl.clone();
 
-  // Verifica se a rota é protegida e se o token está ausente
-  if (protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route)) && !token) {
-    return NextResponse.redirect(new URL("/login", request.url)); // Redireciona para login
+  if (url.pathname === "/" && token) {
+    console.log("Usuário logado, redirecionando para /pokemons");
+    url.pathname = "/pokemons";
+    return NextResponse.redirect(url);
+  }
+  if (url.pathname === "/" && !token) {
+    console.log("Usuário logado, redirecionando para /pokemons");
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
   }
 
-  return NextResponse.next(); // Permite acesso se o token existir
+  const protectedRoutes = ["/pokemons"];
+  if (
+    protectedRoutes.some((route) => url.pathname.startsWith(route)) &&
+    !token
+  ) {
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
 }
 
-// Configura para aplicar somente em rotas específicas
 export const config = {
-  matcher: ["/pokemons/:path*"], // Middleware será aplicado em /pokemons e subrotas
+  matcher: ["/", "/pokemons/:path*"],
 };
